@@ -5,8 +5,8 @@
 behave mswin
 
 " 设置路径(可以把vimrc放在指定文件夹）
-" 这样设置的原因是我把vim集成在TC中
-let $VIM = '$COMMANDER_PATH\Tools\vim\vim_TheWhisperOfTheWind'
+" 取得本文件所在的目录
+let $VIM = fnamemodify(resolve(expand('<sfile>:p')), ':h')
 
 " 将空格键设置为 <leader> 键
 let mapleader = "\<space>"
@@ -22,8 +22,6 @@ if has("gui_running")
 else
 	let g:isGUI = 0
 endif
-
-
 
 "gvim
 if (g:isGUI)
@@ -1664,8 +1662,6 @@ imap [9 <esc>$a {{{9<esc>
 nnoremap <leader>w :w<CR>
 " 退出
 nnoremap <leader>q :q<CR>
-" 强制退出
-nnoremap <leader>Q :q!<CR>
 
 " 快速移动
 nnoremap <C-j> 5j
