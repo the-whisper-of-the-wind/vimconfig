@@ -10,11 +10,6 @@ let $VIM = '$COMMANDER_PATH\Tools\vim\vim_TheWhisperOfTheWind'
 
 " 将空格键设置为 <leader> 键
 let mapleader = "\<space>"
-" 把逗号映射为冒号(如果<leader>键不是空格，则映射为空格)
-noremap , :
-" 将分号 ; 映射为 %(在 Vim 中，% 是一个很有用的快捷键，它可以在匹配的括号、标签等之间进行跳转)
-" 遇到用;的情况用easy-motion插件
-noremap ; %
 " 设置 <leader> 键的延迟时间为 500 毫秒
 set timeoutlen=500  
 
@@ -28,6 +23,8 @@ else
 	let g:isGUI = 0
 endif
 
+
+
 "gvim
 if (g:isGUI)
 " 高亮显示当前光标所在的行
@@ -39,6 +36,7 @@ if (g:isGUI)
   colo evening "夜晚风格
 " vim的第三方配置方案（插件）
  "colo solarized
+ 
 
 " 自定义当前行背景颜色
   hi cursorline guibg=#333333
@@ -81,6 +79,9 @@ function! ToggleCaption()
     endif
 endfunction
 
+
+
+
 endif
 
 " 终端
@@ -115,6 +116,9 @@ augroup CmdlineModeCursor
     autocmd CmdlineEnter * hi Cursor guifg=NONE guibg=Red ctermfg=NONE ctermbg=1
     autocmd CmdlineLeave * hi Cursor guifg=NONE guibg=#ADD8E6 ctermfg=NONE ctermbg=117
 augroup END
+
+
+
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " 不同OS {{{1
@@ -229,6 +233,8 @@ Plugin 'VundleVim/Vundle.vim'
 
 " 文件目录树
 Plugin 'preservim/nerdtree'                       
+" 目录查看器
+Plugin 'justinmk/vim-dirvish'
 
 " 美化底部插件
 Plugin 'vim-airline/vim-airline'                 
@@ -278,6 +284,8 @@ Plugin 'preservim/vim-markdown'
 
 " Mark插件
 Plugin 'kshenoy/vim-signature'
+" 查看寄存器
+Plugin 'junegunn/vim-peekaboo'
 
 " git插件
 Plugin 'tpope/vim-fugitive'
@@ -321,6 +329,14 @@ let NERDTreeShowHidden=1
 " 设置显示行号
 let NERDTreeShowLineNumbers=1
 
+" 把文件夹的箭头图标
+let g:NERDTreeDirArrows = 1
+
+" 将选中的项移动到窗口的中央位置
+let NERDTreeAutoCenter=1
+
+
+
 " 定义 <leader>n 快捷键来打开或关闭 NERDTree
 nnoremap <leader>n :NERDTreeToggle<CR>
 
@@ -347,6 +363,13 @@ endfunction
 
 " 快捷键
 " x——收起该节点的父节点
+
+
+
+
+
+
+
 
 " airline {{{3
 " 状态栏 {{{4
@@ -1341,6 +1364,10 @@ set listchars=space:.,tab:..,trail:-,eol:$
 " SpecialKey 高亮组主要用于高亮显示特殊键字符，像不可见字符（如空格、制表符等）
 highlight SpecialKey guifg=#808080
 
+" 修改行号为浅灰色，默认主题的黄色行号很难看，换主题可以仿照修改
+highlight LineNr term=bold cterm=NONE ctermfg=DarkGrey ctermbg=NONE 
+	\ gui=NONE guifg=DarkGrey guibg=NONE
+
 "换行,折行 set lbr 在breakat字符处而不是最后一个字符处断行, 应该把默认的breakat中去掉空格
 set nolbr
 
@@ -1387,6 +1414,7 @@ set tabstop=2
 set history=1000  
 " 设置 Vim 的撤销级别数量
 set undolevels=1000
+
 
 " 不让vim发出讨厌的滴滴声和闪烁
 set noeb vb t_vb=
@@ -1446,6 +1474,36 @@ vnoremap <silent> # :call VisualSearch('b')<CR>
 nmap <Leader>/ /<C-R>=expand("<cWORD>")<CR>
 "vmap <Leader>/ "ry/<C-R>r 原来的没有处理回车
 vmap <Leader>/ "ry/<c-r>=substitute(escape('<c-r>r', '\^$~/.[]'),'\r','\\n','ge')<CR>
+
+
+" 删除buffer时不关闭窗口
+command! Bclose call <SID>BufcloseCloseIt()
+function! <SID>BufcloseCloseIt()
+	let l:currentBufNum = bufnr("%")
+	let l:alternateBufNum = bufnr("#")
+
+	if buflisted(l:alternateBufNum)
+		buffer #
+	else
+		bnext
+		"bprevious
+	endif
+
+	if bufnr("%") == l:currentBufNum
+		new
+	endif
+
+	if buflisted(l:currentBufNum)
+		execute("bdelete! ".l:currentBufNum)
+	endif
+endfunction
+
+
+
+
+
+
+
 
 
 " vim自带的补全
@@ -1538,7 +1596,9 @@ set foldtext=foldtext()
 set noai          " autoindent 自动缩进
 set nosi          " no smartindent 智能缩进
 set nocindent     " cindent C/C++风格缩进
-set wildmenu      "在系统支持 wildmenu 特性启用文本模式的菜单
+
+" 允许下方显示目录,在系统支持 wildmenu 特性启用文本模式的菜单
+set wildmenu      
 
 "fold的方式，有 indent,syntax 语法,设置折叠方法为缩进折叠
 set foldmethod=syntax  
@@ -1602,8 +1662,10 @@ imap [9 <esc>$a {{{9<esc>
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " 保存
 nnoremap <leader>w :w<CR>
+" 退出
+nnoremap <leader>q :q<CR>
 " 强制退出
-nnoremap <leader>q :qa!<CR>
+nnoremap <leader>Q :q!<CR>
 
 " 快速移动
 nnoremap <C-j> 5j
