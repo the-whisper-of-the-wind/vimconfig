@@ -35,7 +35,6 @@ if (g:isGUI)
 " vim的第三方配置方案（插件）
  "colo solarized
  
-
 " 自定义当前行背景颜色
   hi cursorline guibg=#333333
  "hi CursorColumn guibg=#333333
@@ -76,10 +75,6 @@ function! ToggleCaption()
         let g:caption_enabled = 1
     endif
 endfunction
-
-
-
-
 endif
 
 " 终端
@@ -142,10 +137,31 @@ if (has("win32") || has("win64"))
 	autocmd! bufwritepost .vimrc source $VIMRUNTIME\_vimrc
 
 " 设置英文等宽nerd字体
-  set guifont=JetBrainsMonoNL_NFM:h10:cANSI:qDRAFT
-
+  " set guifont=JetBrainsMonoNL_NFM:h10:cANSI:qDRAFT
+  set guifont=JetBrainsMonoNL_NFM:h10
 " 设置中文等宽nerd字体
-  set guifontwide=LXGWWenKaiMono_Nerd_Font:h10:cGB2312:qDRAFT
+  " set guifontwide=LXGWWenKaiMono_Nerd_Font:h10:cGB2312:qDRAFT
+  set guifontwide=LXGWWenKaiMono_Nerd_Font:h10
+" 在 GUI 中快速改变字体大小
+command! Bigger  :let &guifont = substitute(&guifont, '\d\+$', '\=submatch(0)+1', '')
+command! Biggerwide  :let &guifontwide = substitute(&guifontwide, '\d\+$', '\=submatch(0)+1', '')
+command! Smaller :let &guifont = substitute(&guifont, '\d\+$', '\=submatch(0)-1', '')
+command! Smallerwide :let &guifontwide = substitute(&guifontwide, '\d\+$', '\=submatch(0)-1', '')
+" 管道符 | 是用于分隔多个普通命令,对于自定义命令不会自动识别 | 作为分隔符
+" 使用函数封装
+function! IncreaseBothFontSizes()
+    execute 'Bigger'
+    execute 'Biggerwide'
+endfunction
+
+function! DecreaseBothFontSizes()
+    execute 'Smaller'
+    execute 'Smallerwide'
+endfunction
+
+command! BiggerAll call IncreaseBothFontSizes()
+command! SmallerAll call DecreaseBothFontSizes()
+
 
 "关闭vim时候自动保存打开文件的信息
 	au VimLeave * mksession! $VIMRUNTIME\Session.vim
@@ -333,8 +349,6 @@ let g:NERDTreeDirArrows = 1
 " 将选中的项移动到窗口的中央位置
 let NERDTreeAutoCenter=1
 
-
-
 " 定义 <leader>n 快捷键来打开或关闭 NERDTree
 nnoremap <leader>n :NERDTreeToggle<CR>
 
@@ -361,12 +375,6 @@ endfunction
 
 " 快捷键
 " x——收起该节点的父节点
-
-
-
-
-
-
 
 
 " airline {{{3
@@ -1305,6 +1313,8 @@ set go=
 set nu            
 " 相对行号 relativenumber rnu
 set rnu           
+" 修改行号为浅灰色，默认主题的黄色行号很难看，换主题可以仿照修改
+highlight LineNr term=bold cterm=NONE ctermfg=DarkGrey ctermbg=NONE gui=NONE guifg=DarkGrey guibg=NONE
 
 " 显示命令(右下角）
 set showcmd       
@@ -1320,11 +1330,13 @@ set backspace=eol,start,indent
 " 退格键和方向键可以换行
 set whichwrap+=<,>,h,l 
 
-" 增量式搜索
+" 增量式搜索,在执行查找前预览第一处匹配
 set incsearch     
 
 " hls,hlsearch 高亮搜索,noh临时关闭，nohls关闭
 set hls
+" 执行重新绘制，并且取消通过 / 和 ? 匹配字符的高亮，修复代码高亮问题,刷新「比较模式」的代码高亮
+nnoremap <C-l> :nohlsearch<cr>:diffupdate<cr>:syntax sync fromstart<cr><c-l>
 
 " ignorecase 搜索时忽略大小写
 set ic            
@@ -1362,9 +1374,6 @@ set listchars=space:.,tab:..,trail:-,eol:$
 " SpecialKey 高亮组主要用于高亮显示特殊键字符，像不可见字符（如空格、制表符等）
 highlight SpecialKey guifg=#808080
 
-" 修改行号为浅灰色，默认主题的黄色行号很难看，换主题可以仿照修改
-highlight LineNr term=bold cterm=NONE ctermfg=DarkGrey ctermbg=NONE 
-	\ gui=NONE guifg=DarkGrey guibg=NONE
 
 "换行,折行 set lbr 在breakat字符处而不是最后一个字符处断行, 应该把默认的breakat中去掉空格
 set nolbr
@@ -1425,13 +1434,8 @@ endif
 autocmd BufEnter * if &filetype !=# 'fugitive' | :cd %:p:h | endif
 autocmd BufEnter * if &filetype !=# 'fugitive' | :lcd %:p:h | endif
 autocmd BufEnter * if &filetype !=# 'fugitive' | :syntax sync fromstart | endif
-
 " 文件写入后，若 filetype 不为 fugitive，将当前工作目录切换到文件所在目录
 autocmd BufWritePost * if &filetype !=# 'fugitive' | :lcd %:p:h | endif
-
-
-
-
 
 "打开文件 光标定位到上次编辑的地方
 if has("autocmd")
@@ -1445,7 +1449,6 @@ endif
 "set viminfo='10,\"100,:20,%,n~/.viminfo
 set viminfo='10,\"100,:20,%,n$VIMRUNTIME/.viminfo
 au BufReadPost * if line("'\"") > 0|if line("'\"") <= line("$")|exe("norm '\"")|else|exe "norm $"|endif|endif
-
 
 " 根据给定方向搜索当前光标下的单词，结合下面两个绑定使用
 function! VisualSearch(direction) range
@@ -1469,9 +1472,9 @@ vnoremap <silent> * :call VisualSearch('f')<CR>
 vnoremap <silent> # :call VisualSearch('b')<CR>
 
 "继续搜索光标下文字
-nmap <Leader>/ /<C-R>=expand("<cWORD>")<CR>
+nmap <Leader><leader>/ /<C-R>=expand("<cWORD>")<CR>
 "vmap <Leader>/ "ry/<C-R>r 原来的没有处理回车
-vmap <Leader>/ "ry/<c-r>=substitute(escape('<c-r>r', '\^$~/.[]'),'\r','\\n','ge')<CR>
+vmap <Leader><leader>/ "ry/<c-r>=substitute(escape('<c-r>r', '\^$~/.[]'),'\r','\\n','ge')<CR>
 
 
 " 删除buffer时不关闭窗口
@@ -1495,12 +1498,6 @@ function! <SID>BufcloseCloseIt()
 		execute("bdelete! ".l:currentBufNum)
 	endif
 endfunction
-
-
-
-
-
-
 
 
 
@@ -1749,6 +1746,10 @@ nnoremap <silent> <C-Right> <Esc>>>
 nnoremap <silent> <C-Up>    <Esc>:call MoveUp()<CR>
 nnoremap <silent> <C-Down>  <Esc>:call MoveDown()<CR>
 
+" 防止水平滑动的时候失去选择
+xnoremap <  <gv
+xnoremap >  >gv
+
 " 上下移动选中文本
 vnoremap J :move '>+1<CR>gv-gv
 vnoremap K :move '<-2<CR>gv-gv
@@ -1756,6 +1757,11 @@ vnoremap K :move '<-2<CR>gv-gv
 " 可以跨行（用gj、gk）也可以
 noremap j gj
 noremap k gk
+
+" 历史命令
+cnoremap <c-n> <down>
+cnoremap <c-p> <up>
+
 
 "输入状态下移动
 inoremap <Up> <C-o>k
