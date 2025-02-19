@@ -51,7 +51,7 @@ function! ToggleTransparency()
         call libcallnr("vimtweak64.dll", "SetAlpha", 255)
         let g:caption_transparent = 0
     else
-        " 透明（Alpha 值为 220）
+        " 透明（Alpha 值为 200）
         call libcallnr("vimtweak64.dll", "SetAlpha", 200)
         let g:caption_transparent = 1
     endif
@@ -110,21 +110,17 @@ augroup CmdlineModeCursor
     autocmd CmdlineLeave * hi Cursor guifg=NONE guibg=#ADD8E6 ctermfg=NONE ctermbg=117
 augroup END
 
-
-
-
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " 不同OS {{{1
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " 判断操作系统
 if (has("win32") || has("win64"))
 	let g:isWin = 1
-" 用于表示 Windows 系统的路径分隔符
 	let g:slash = '\'
 
 " TC路径设置
-	let g:COMMANDER_PATH = "d:\SoftDir\totalcmd_TheWhisperOfTheWind"
-	let g:COMMANDER_EXE = "d:\SoftDir\totalcmd_TheWhisperOfTheWind\TOTALCMD.EXE"
+	let g:COMMANDER_PATH = "d:/SoftDir/totalcmd_TheWhisperOfTheWind"
+	let g:COMMANDER_EXE = "d:/SoftDir/totalcmd_TheWhisperOfTheWind/TOTALCMD.EXE"
 
 " 将终端编码设置为与当前编码相同,通常win下的encoding为cp936
 	let &termencoding=&encoding
@@ -150,13 +146,13 @@ command! Smallerwide :let &guifontwide = substitute(&guifontwide, '\d\+$', '\=su
 " 管道符 | 是用于分隔多个普通命令,对于自定义命令不会自动识别 | 作为分隔符
 " 使用函数封装
 function! IncreaseBothFontSizes()
-    execute 'Bigger'
-    execute 'Biggerwide'
+    execute "Bigger"
+    execute "Biggerwide"
 endfunction
 
 function! DecreaseBothFontSizes()
-    execute 'Smaller'
-    execute 'Smallerwide'
+    execute "Smaller"
+    execute "Smallerwide"
 endfunction
 
 command! BiggerAll call IncreaseBothFontSizes()
@@ -357,9 +353,9 @@ let NERDTreeBookmarksFile=$VIM.'/NerdBookmarks.txt'
 
 "在tree窗口中才能执行
 " 创建标签
-nmap <m-f7> <esc>:Bookmark 
+nmap <C-f7> <esc>:Bookmark 
 " 删除标签
-nmap <m-F8> <esc> :ClearBookmarks 
+nmap <C-F8> <esc> :ClearBookmarks 
 
 " 当 NERDTree 窗口打开时，映射 Shift+字母 到对应盘符
 autocmd FileType nerdtree nmap <buffer> <S-D> :call CustomNERDTreeFind('D:\\')<CR>
@@ -1256,13 +1252,6 @@ noremap <C-Y> <C-R>
 " 在插入模式下，同样使用 <C-O> 临时切换到普通模式执行 <C-R> 命令
 inoremap <C-Y> <C-O><C-R>
 
-" 在 GUI 模式下，将 Alt + Space 映射为系统菜单操作
-if has("gui")
-	noremap <M-Space> :simalt ~<CR>
-	inoremap <M-Space> <C-O>:simalt ~<CR>
-	cnoremap <M-Space> <C-C>:simalt ~<CR>
-endif
-
 " 将 Ctrl + A 映射为全选操作
 noremap <C-A> ggVG
 inoremap <C-A> <C-C>ggVG
@@ -1336,7 +1325,7 @@ set incsearch
 " hls,hlsearch 高亮搜索,noh临时关闭，nohls关闭
 set hls
 " 执行重新绘制，并且取消通过 / 和 ? 匹配字符的高亮，修复代码高亮问题,刷新「比较模式」的代码高亮
-nnoremap <C-l> :nohlsearch<cr>:diffupdate<cr>:syntax sync fromstart<cr><c-l>
+nnoremap <Tab> :nohlsearch<cr>:diffupdate<cr>:syntax sync fromstart<cr><c-l>
 
 " ignorecase 搜索时忽略大小写
 set ic            
@@ -1351,8 +1340,18 @@ set showmatch matchpairs=(:),[:],{:},<:>,（:）,【:】,｛:｝,《:》
 
 " 设置自动补全的来源
 set complete=.,w,b,u,t,i,d 
-" 设置自动补全的选项
+" 用于插入模式的补全,设置自动补全的选项
 set completeopt=longest,menuone,noinsert,noselect
+" 命令行补全选项设置
+if has('patch-8.2.4500')
+  " 使命令行补全支持弹出菜单和模糊匹配
+  set wildoptions+=pum,fuzzy
+  " 表示先显示最长匹配项，再显示所有匹配项
+  set wildmode=longest,full
+  " 用于映射 <cr>（回车）和 <esc>（退出）键，当弹出菜单可见时执行相应操作
+  cnoremap <expr> <cr> pumvisible() ? "\<c-y>" : "\<cr>"
+  cnoremap <expr> <esc> pumvisible() ? "\<c-e>" : "\<esc>"
+endif
 
 " nobackup 关闭备份 backup
 set nobackup      
@@ -1661,14 +1660,21 @@ nnoremap <leader>w :w<CR>
 nnoremap <leader>q :q<CR>
 
 " 快速移动
-nnoremap <C-j> 5j
-vnoremap <C-j> 5j
-nnoremap <C-k> 5k
-vnoremap <C-k> 5k
 nnoremap <C-u> 10k
 vnoremap <C-u> 10k
 nnoremap <C-d> 10j
 vnoremap <C-d> 10j
+
+"翻页
+map <C-j> <C-f>
+map <C-k> <C-b>
+imap <C-j> <C-o><PageDown>
+imap <C-k> <C-o><PageUp>
+vmap <C-j> <S-PageDown>
+vmap <C-k> <S-PageUp>
+
+"恢复上一次的选择
+nnoremap <A-BS> `<v`>
 
 " 映射 sh 组合键进行上下分屏
 nnoremap <silent> sh :split<CR>
@@ -1783,6 +1789,8 @@ noremap <Leader>, @:
 " 执行存储在 q 寄存器中的宏
 noremap <Leader>. @q
 
+"复制当前行不带回车(V复制当前行后p粘贴会粘贴到下一行)
+noremap <Leader>Y 0y$
 "复制全文并不移动光标
 noremap <Leader>G :%y<cr>
 "上下两行互换
@@ -2067,6 +2075,7 @@ endfunction
 command! -nargs=? SS call Session("SAVE",<f-args>)
 " 调用 Session 函数加载会话
 command! -nargs=? SL call Session("LOAD",<f-args>)
+
 
 
 
