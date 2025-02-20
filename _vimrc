@@ -30,7 +30,7 @@ if (g:isGUI)
 " 高亮显示当前光标所在的列
   "set cursorcolumn
 
-" vim内置的配色方案
+" vim内置的配色方案(evening,peachpuff,ron,shine,sorbet)
   colo evening "夜晚风格
 " vim的第三方配置方案（插件）
  "colo solarized
@@ -91,7 +91,7 @@ if (!g:isGUI)
 
 "自定义当前行背景颜色
   hi cursorline guibg=#333333
- "hi CursorColumn guibg=#333333
+"hi CursorColumn guibg=#333333
 
 endif
 
@@ -243,6 +243,7 @@ Plugin 'VundleVim/Vundle.vim'
 
 " 文件目录树
 Plugin 'preservim/nerdtree'                       
+
 " 目录查看器
 Plugin 'justinmk/vim-dirvish'
 
@@ -324,8 +325,8 @@ call vundle#end()   " 结束
 
 " 插件配置 {{{2
 " nerdtree {{{3
-" 开启 NERDTree 的圣诞节日效果，在特定时间可能会让 NERDTree 显示一些节日装饰
-let NERDChristmasTree=1
+" " 开启 NERDTree 的圣诞节日效果，在特定时间可能会让 NERDTree 显示一些节日装饰
+" let NERDChristmasTree=1
 
 " 设置显示书签
 let NERDTreeShowBookmarks=1
@@ -336,14 +337,14 @@ let NERDTreeShowFiles=1
 " 设置显示隐藏文件
 let NERDTreeShowHidden=1
 
-" 设置显示行号
-let NERDTreeShowLineNumbers=1
+" " 设置显示行号
+" let NERDTreeShowLineNumbers=1
 
-" 把文件夹的箭头图标
-let g:NERDTreeDirArrows = 1
+" " 把文件夹的箭头图标
+" let g:NERDTreeDirArrows = 1
 
-" 将选中的项移动到窗口的中央位置
-let NERDTreeAutoCenter=1
+" " 将选中的项移动到窗口的中央位置
+" let NERDTreeAutoCenter=1
 
 " 定义 <leader>n 快捷键来打开或关闭 NERDTree
 nnoremap <leader>n :NERDTreeToggle<CR>
@@ -372,6 +373,25 @@ endfunction
 " 快捷键
 " x——收起该节点的父节点
 
+" vim-dirvish {{{3
+" 在 Vim 命令模式下输入 :Dirvish \正常模式下按下-,即可打开当前工作目录的文件浏览器,q退出文件浏览器
+" 使用 :Dirvish /path/to/directory 命令可以打开指定目录的文件浏览器
+" 将光标移动到目录上，按下回车键（Enter）即可进入该目录。按下 - 键可以返回上级目录
+" 按下 o 键会在新窗口打开文件；按下 v 键会在垂直分割的新窗口打开文件；按下 s 键会在水平分割的新窗口打开文件
+" 创建文件：按下 % 键，然后输入文件名，再按下回车键，即可在当前目录下创建新文件。
+" 创建目录：按下 d 键，接着输入目录名，最后按下回车键，就能在当前目录下创建新目录。
+" 将光标移动到要删除的文件或目录上，按下 D 键，然后确认删除操作
+" 将光标移动到要重命名的文件或目录上，按下 R 键，输入新名称后按下回车键
+" 复制：先使用 m 标记要复制的文件或目录，然后按下 yy 复制，接着移动光标到目标目录，按下 p 粘贴。
+" 移动：同样先使用 m 标记，按下 dd 剪切，再移动到目标目录按下 p 粘贴。
+" 单个标记：将光标移动到文件上，按下 m 标记该文件，再次按下 m 取消标记。
+" 全选：按下 * 可以标记所有文件，再次按下 * 取消全选。
+" 批量重命名 标记好要重命名的文件后，按下 R 进入批量重命名模式，此时会打开一个新的缓冲区，在这个缓冲区中可以对文件名进行编辑，编辑完成后保存退出，所有标记的文件会按照新的名称进行重命名。
+" 批量删除 标记好要删除的文件后，按下 D 键，确认删除操作，所有标记的文件会被删除。
+" 过滤与排序
+" 过滤文件 可以使用 :Dirvish +filter:pattern 命令来过滤文件，只显示符合指定模式的文件。例如，:Dirvish +filter:.txt$ 只显示以 .txt 结尾的文件。
+" 排序文件 使用 :Dirvish +sort:option 命令来对文件进行排序。常见的排序选项有： +sort:name：按文件名排序（默认）。 +sort:size：按文件大小排序。 +sort:time：按文件修改时间排序。
+
 
 " airline {{{3
 " 状态栏 {{{4
@@ -384,6 +404,19 @@ let g:airline_theme='lucius'
 
 " 加载 airline 插件
 let g:airline#extensions#default#enabled = 1
+
+" powerline字符
+if !exists('g:airline_symbols')
+    let g:airline_symbols = {}
+  endif
+  let g:airline_left_sep = ''
+  let g:airline_left_alt_sep = ''
+  let g:airline_right_sep = ''
+  let g:airline_right_alt_sep = ''
+  let g:airline_symbols.branch = ''
+  let g:airline_symbols.dirty='⚡'
+  let g:airline_symbols.linenr = ' L:'
+  let g:airline_symbols.colnr = ' C:'
 
 " 定义函数来获取文件大小
 function! GetFileSize()
@@ -422,6 +455,7 @@ function! AddInfo()
     " 自定义 airline 的配置，在原有内容后添加文件大小、字数、折叠方式
     let g:airline_section_z = original_section_z . ' /%{GetFileSize()} /%{GetWordCount()} /%{AirlineGetFoldMethod()}'
 endfunction
+
 
 " airline——tabline(tab、buffer、window) {{{4
 "buffer是缓存文件，window是用来显示buffer的窗口，tab则是当前widow的集合（布局），类似于平铺式窗口管理器,不同的tab代表着window的布局不同
@@ -664,7 +698,6 @@ nnoremap <leader>[ viw<esc>bi[[<esc>ea]]<esc>
 
 "quickui {{{4
 
-
 " 更改边框字符
 let g:quickui_border_style = 2
   
@@ -733,12 +766,6 @@ if has('win32') || has('win64') || has('win16') || has('win95')
 endif
 
 
-
-
-
-
-
-
 call quickui#menu#install('Help (&?)', [
 			\ ["&Index", 'tab help index', ''],
 			\ ['Ti&ps', 'tab help tips', ''],
@@ -752,16 +779,8 @@ call quickui#menu#install('Help (&?)', [
 			\ ['&Dash Help', 'call asclib#utils#dash_ft(&ft, expand("<cword>"))'],
 			\ ], 10000)
 
-
-
-
-
-
-
-
 " 双击<space>打开目录
 noremap <space><space> :call quickui#menu#open()<cr>
-
 
 " 模糊查找 {{{3
 
@@ -1685,6 +1704,10 @@ nnoremap <silent> sc :close<CR>
 " 映射 so 组合键关闭其他屏幕
 nnoremap <silent> so :only<CR>
 
+" 设置window分割线及边缘颜色
+set fillchars+=vert:│
+highlight VertSplit gui=NONE term=NONE guibg=NONE guifg=NONE ctermbg=NONE ctermfg=NONE
+
 " 窗口跳转配置
 nnoremap <leader>h <C-w>h
 nnoremap <leader>l <C-w>l
@@ -2075,6 +2098,21 @@ endfunction
 command! -nargs=? SS call Session("SAVE",<f-args>)
 " 调用 Session 函数加载会话
 command! -nargs=? SL call Session("LOAD",<f-args>)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
